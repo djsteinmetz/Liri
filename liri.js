@@ -1,3 +1,4 @@
+//TODO: The 'failout' part of each function if a user does not give any arguments
 // Require a .env file containing API keys
 require('dotenv').config();
 // Reference the API keys
@@ -14,8 +15,6 @@ var client = new Twitter(keys.twitter);
 var command = process.argv[2];
 var args = process.argv;
 var userInquiry = [];
-// Initialize functions 
-// spotify-this-song function
 function spotifyThis() {
   stringifyArgs();
   spotify.search({ type: 'track', query: userInquiry, limit: 20 }, function(err, data) {
@@ -34,7 +33,6 @@ function spotifyThis() {
     consoleEnd();
   });
 };
-// TODO: movie-this function
 function movieThis() {
   stringifyArgs();
   // Then run a request to the OMDB API with the movie specified
@@ -45,13 +43,27 @@ function movieThis() {
     if (!error && response.statusCode === 200) {
       console.log(JSON.parse(body));
       consoleInit();
-      console.log("Title: " + JSON.parse(body).Title)
-      console.log("Release Year: " + JSON.parse(body).Year);
+      console.log(JSON.parse(body).Title + ", " + JSON.parse(body).Year);
+      console.log("Ratings:");
+      console.group()
+      // Loop through ratings and log
+      var ratings = JSON.parse(body).Ratings
+      for(var i=0; i<ratings.length; i++) {
+        if(ratings[i].Source === "Internet Movie Database") {
+          console.log(ratings[i].Source + ": " + ratings[i].Value);
+        } else if(ratings[i].Source === "Rotten Tomatoes") { 
+          console.log(ratings[i].Source + ": " + ratings[i].Value) 
+        }
+      };
+      console.groupEnd();
+      console.log("Country of production: " + JSON.parse(body).Country);
+      console.log("Language: " + JSON.parse(body).Language);
+      console.log("Actor(s): " + JSON.parse(body).Actors);
+      console.log("Plot: " + JSON.parse(body).Plot);
       consoleEnd();
     }
   });
 };
-// my-tweets function
 function myTweets() {
   var params = {screen_name: 'liriDj'};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
