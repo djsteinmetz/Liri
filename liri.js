@@ -1,7 +1,6 @@
 //TODO: The 'failout' part of each function if a user does not give any arguments
 // Require a .env file containing API keys
 require('dotenv').config();
-// Reference the API keys
 var keys = require('./keys');
 // Reference the node-packages for the following
 var Spotify = require('node-spotify-api');
@@ -17,6 +16,9 @@ var args = process.argv;
 var userInquiry = [];
 function spotifyThis() {
   stringifyArgs();
+  if(!userInquiry) {
+    userInquiry = "0hrBpAOgrt8RXigk83LLNE&type=uri";
+  };
   spotify.search({ type: 'track', query: userInquiry, limit: 20 }, function(err, data) {
     if (err) {
       return console.log('Error occurred: ' + err);
@@ -37,17 +39,20 @@ function movieThis() {
   stringifyArgs();
   // Then run a request to the OMDB API with the movie specified
   userInquiry = userInquiry.split(' ').join('+');
+  if(!userInquiry) {
+    userInquiry = "Mr. Nobody";
+  };
   var queryUrl = "http://www.omdbapi.com/?t=" + userInquiry + "&y=&plot=short&apikey=trilogy";
   request(queryUrl, function(error, response, body) {
     // If the request is successful
     if (!error && response.statusCode === 200) {
-      console.log(JSON.parse(body));
+      var body = (JSON.parse(body));
       consoleInit();
-      console.log(JSON.parse(body).Title + ", " + JSON.parse(body).Year);
+      console.log(body.Title + ", " + body.Year);
       console.log("Ratings:");
       console.group()
       // Loop through ratings and log
-      var ratings = JSON.parse(body).Ratings
+      var ratings = body.Ratings
       for(var i=0; i<ratings.length; i++) {
         if(ratings[i].Source === "Internet Movie Database") {
           console.log(ratings[i].Source + ": " + ratings[i].Value);
@@ -56,10 +61,10 @@ function movieThis() {
         }
       };
       console.groupEnd();
-      console.log("Country of production: " + JSON.parse(body).Country);
-      console.log("Language: " + JSON.parse(body).Language);
-      console.log("Actor(s): " + JSON.parse(body).Actors);
-      console.log("Plot: " + JSON.parse(body).Plot);
+      console.log("Country of production: " + body.Country);
+      console.log("Language: " + body.Language);
+      console.log("Actor(s): " + body.Actors);
+      console.log("Plot: " + body.Plot);
       consoleEnd();
     }
   });
