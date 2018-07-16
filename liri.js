@@ -134,7 +134,7 @@ function consoleEnd() {
   console.groupEnd();
   console.warn("---------------------------------");
 };
-// Switch statement to handle the liri commands
+// Function to run app and switch statement to handle the liri commands
 function runApp() {
   switch(command) {
   case "my-tweets":
