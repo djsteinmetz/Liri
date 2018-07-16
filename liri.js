@@ -1,25 +1,22 @@
-//TODO: The 'failout' part of each function if a user does not give any arguments
 // Require a .env file containing API keys
 require('dotenv').config();
-var keys = require('./keys');
-// Reference the node-packages for the following
-var Spotify = require('node-spotify-api');
-var Twitter = require('twitter');
-var request = require('request');
-var fs = require('fs');
-var moment = require('moment');
-// Initialize variables
-var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+const keys = require('./keys');
+// require the node-packages
+const Spotify = require('node-spotify-api');
+const Twitter = require('twitter');
+const request = require('request');
+const fs = require('fs');
+const moment = require('moment');
 var command = process.argv[2];
 var args = process.argv;
 var userInquiry = [];
 function spotifyThis() {
+  var spotify = new Spotify(keys.spotify);
   stringifyArgs();
   if(!userInquiry) {
-    userInquiry = "0hrBpAOgrt8RXigk83LLNE&type=uri";
+    userInquiry = "The Sign";
   };
-  spotify.search({ type: 'track', query: userInquiry, limit: 20 }, function(err, data) {
+  spotify.search({ type: 'track', query: userInquiry, limit: 1 }, function(err, data) {
     if (err) {
       return console.log('Error occurred: ' + err);
     }
@@ -70,6 +67,7 @@ function movieThis() {
   });
 };
 function myTweets() {
+  var client = new Twitter(keys.twitter);
   var params = {screen_name: 'liriDj'};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
   if (!error) {
@@ -86,9 +84,19 @@ function myTweets() {
   };
 });
 };
-// TODO: random function
 function random() {
-  // function here
+  fs.readFile("random.txt", "utf8", function (error, data) {
+    if (error) {
+        return console.log(error);
+    }
+    var dataArray = data.split(",");
+    console.log(dataArray[1])
+    dataArray[1] = dataArray[1].split(" ");
+    console.log(dataArray[1]);
+    command = dataArray[0];
+    userInquiry = dataArray[1];
+    runApp();
+});
 };
 // Stringify user arguments
 function stringifyArgs() {
@@ -127,7 +135,8 @@ function consoleEnd() {
   console.warn("---------------------------------");
 };
 // Switch statement to handle the liri commands
-switch(command) {
+function runApp() {
+  switch(command) {
   case "my-tweets":
     myTweets();
     break;
@@ -140,4 +149,6 @@ switch(command) {
   case "do-what-it-says":
     random();
     break;
-};
+  };
+}
+runApp();
