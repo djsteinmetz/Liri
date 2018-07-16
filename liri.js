@@ -7,6 +7,8 @@ const Twitter = require('twitter');
 const request = require('request');
 const fs = require('fs');
 const moment = require('moment');
+const linebreak = "\n\n"
+var timestamp = moment().format("LLLL");
 var command = process.argv[2];
 var args = process.argv;
 var userInquiry = [];
@@ -23,13 +25,24 @@ function spotifyThis() {
     consoleInit();
     // Loop through artists and combine
     var artists = data.tracks.items[0].artists
+    let logArtists = [];
+    console.log(artists)
+    let logCommand = "Command: " + command.split("-").join(" ");
+    let logTimestamp = "Run on: " + timestamp
+    let logSong = "\nSong name: " + data.tracks.items[0].name
+    let logPreview = "\nPreview: " + data.tracks.items[0].preview_url
+    let logAlbum = "\nAlbum: " + data.tracks.items[0].album.name
     for(var i=0; i<artists.length; i++) {
-      console.log("Artist(s): " + artists[i].name);
+      logArtists.push(artists[i].name);
     };
-    console.log("Song name: " + data.tracks.items[0].name);
-    console.log("Preview: " + data.tracks.items[0].preview_url); 
-    console.log("Album: " + data.tracks.items[0].album.name);
+    logArtists = "\nArtist(s): " + logArtists.join(", ");
+    console.log(logArtists)
+    console.log(logSong + logPreview + logAlbum);
     consoleEnd();
+    fs.appendFile('log.txt', logCommand + ", " + logTimestamp + logSong + logArtists + logPreview + logAlbum + linebreak, function (err) {
+      if (err) throw err;
+      console.log('Appended to log.txt!');
+    });
   });
 };
 function movieThis() {
@@ -63,7 +76,11 @@ function movieThis() {
       console.log("Actor(s): " + body.Actors);
       console.log("Plot: " + body.Plot);
       consoleEnd();
-    }
+      fs.appendFile('log.txt', "Command: " + command.split("-").join(" ") + ", Run on: " + timestamp + "\nCountry of production: " + body.Country + "\nLanguage: " + body.Language + "\nActor(s): " + body.Actors + "\nPlot: " + body.Plot + "\n\n", function (err) {
+        if (err) throw err;
+        console.log('Appended to log.txt!');
+      });
+    };
   });
 };
 function myTweets() {
@@ -73,14 +90,18 @@ function myTweets() {
   if (!error) {
     consoleInit();
     for(var i=0; i<tweets.length; i++) {
-      var tweetDate = tweets[i].created_at;
-      tweetDate = moment(tweetDate, "ddd MMM DD HH:mm:ss ZZ YYYY").toString();
-      tweetDate = moment(tweetDate, "ddd MMM DD HH:mm:ss ZZ YYYY").format("MMM DD YYYY");
-      console.log("Tweet from " + tweetDate + ": " + '"' + tweets[i].text + '"');
-      console.groupCollapsed();
-      console.groupEnd();
+        var tweetDate = tweets[i].created_at;
+        tweetDate = moment(tweetDate, "ddd MMM DD HH:mm:ss ZZ YYYY").toString();
+        tweetDate = moment(tweetDate, "ddd MMM DD HH:mm:ss ZZ YYYY").format("MMM DD YYYY");
+        console.log("Tweet from " + tweetDate + ": " + '"' + tweets[i].text + '"');
+        console.groupCollapsed();
+        console.groupEnd();
     }
     consoleEnd();
+    fs.appendFile('log.txt', "Command: " + command.split("-").join(" ") + ", Run on: " + timestamp + "\nCountry of production: " + body.Country + "\nLanguage: " + body.Language + "\nActor(s): " + body.Actors + "\nPlot: " + body.Plot + "\n\n", function (err) {
+      if (err) throw err;
+      console.log('Appended to log.txt!');
+    });
   };
 });
 };
